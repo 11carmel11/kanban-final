@@ -100,7 +100,7 @@ Your work will be graded based on the following considerations:
 - The number of tests you pass
 - Readable and ordered code
   - Spacing & indentation
-  - Indicative vairable/function names
+  - Indicative variable/function names
   - Comments (where necessary)
 - Proper use of Git
   - Small, standalone commits
