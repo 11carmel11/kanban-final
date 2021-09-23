@@ -175,7 +175,7 @@ describe(projectName, () => {
     expect(tasksCountAfterRefresh).toBe(3)
   })
 
-  test('User should be able to move tasks with alt + numbers and the new lists data should be saved to local storage', async () => {
+  test.only('User should be able to move tasks with alt + numbers and the new lists data should be saved to local storage', async () => {
     const tasks = await page.$$('.task')
     await tasks[0].click()
     await tasks[0].hover()

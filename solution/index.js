@@ -1,7 +1,7 @@
 //website setup:
 setSectionsContent();
 
-
+//sets every section's context by the local storage:
 function setSectionsContent() {
   if (localStorage.getItem("tasks")) {
     const localStorageTaskObj = JSON.parse(localStorage.getItem("tasks"));
@@ -27,13 +27,17 @@ function setSectionsContent() {
 }
 
 
-//local storage functions:
+/**
+ * local storage functions:
+ */
+//adds the input to specific array in local storage:
 function addToLocalStorage(key, input) {
   const localStorageTaskObj = JSON.parse(localStorage.getItem("tasks"));
   localStorageTaskObj[key].unshift(input);
   localStorage.setItem("tasks", JSON.stringify(localStorageTaskObj));
 }
 
+//replaces the old text with edited text:
 function updateLocalStorage(key, indexOfCurrentValue, updatedValue) {
   const localStorageTaskObj = JSON.parse(localStorage.getItem("tasks"));
   const section = localStorageTaskObj[key];
@@ -41,6 +45,9 @@ function updateLocalStorage(key, indexOfCurrentValue, updatedValue) {
   localStorage.setItem("tasks", JSON.stringify(localStorageTaskObj));
 }
 
+/**
+ * event handlers functions:
+ */
 //adds the task to list on click
 function addButtonHandler(event) {
   const relevantSection = event.path[1];
@@ -53,7 +60,7 @@ function addButtonHandler(event) {
       taskElm,
       relevantSection.children[1].children[0]
     ); //appends the new element to the top
-    const relevantSectionId = relevantSection.attributes[0].value
+    const relevantSectionId = relevantSection.attributes[0].value;
     addToLocalStorage(relevantSectionId, input);
   }
 }
@@ -82,6 +89,10 @@ function updateTaskHandler(event) {
   updateLocalStorage(key, indexOfOldText, updatedText);
 }
 
+/**
+ * extra functions
+ */
+//creates a relevant <li> element
 function createListElement(text) {
   const element = document.createElement("li");
   element.classList.add("task");
