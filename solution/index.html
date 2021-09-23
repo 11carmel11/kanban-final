@@ -10,7 +10,7 @@
   </head>
   <body>
     <h2 id="page-title">Tasks organizer</h2>
-    <input id="search" type="search" placeholder="search in tasks" />
+    <input id="search" type="search" oninput="searchTasksByQuery(event)" placeholder="search in tasks" />
     <div id="tasksArea" ondblclick="doubleClickHandler(event)">
       <section id="todo">
         <b>tasks to do</b>
