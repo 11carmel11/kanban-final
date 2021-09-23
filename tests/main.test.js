@@ -113,7 +113,7 @@ let wasInPut = false
 
 describe(projectName, () => {
   beforeAll(async () => {
-    browser = await puppeteer.launch({ headless: false }) //change to false if you want to view the page
+    browser = await puppeteer.launch({ headless: false, slowMo:true }) //change to false if you want to view the page
     page = await browser.newPage()
     page.setRequestInterception(true)
     page.on('request', async (req) => {
@@ -209,7 +209,7 @@ describe(projectName, () => {
     expect(localStorageData).toEqual(expectedData)
   })
 
-  test('User should be able to edit task with double click and the new task data will be saved in the local storage', async () => {
+  test.only('User should be able to edit task with double click and the new task data will be saved in the local storage', async () => {
     const firstTask = await page.$('.task')
     const getTaskText = async () =>
       (await firstTask.getProperty('innerText')).jsonValue()
