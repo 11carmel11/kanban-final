@@ -69,6 +69,9 @@ function updateTaskHandler(event) {
   const updatedText = relevantTaskElement.innerText;
   relevantTaskElement.innerHTML = updatedText;
   updateLocalStorage(key, indexOfOldText, updatedText);
+  if (!updatedText) {
+    relevantTaskElement.remove();
+  }
 }
 
 //sets unique name for relevant item, and adds event listener for keydown
@@ -106,11 +109,11 @@ function altKeyPressedHandler(pressed) {
 }
 
 
- //takes input and show tasks that includes it
- function searchTasksByQuery (event) {
+//takes input and show tasks that includes it
+function searchTasksByQuery(event) {
   const query = event.target.value;
   hideUnContainingTasks(query);
- }
+}
 
 /**
  * extra functions
@@ -119,7 +122,7 @@ function altKeyPressedHandler(pressed) {
 function moveBetweenSections(oldId, newId, element) {
   const index = getIndex(oldId, element);
   element.remove();
-  const listWrapperElement = document.getElementById(newId).children[1] 
+  const listWrapperElement = document.getElementById(newId).children[1]
   const firstChild = listWrapperElement.firstChild;
   listWrapperElement.insertBefore(element, firstChild);
   updateLocalStorage(oldId, index);
@@ -184,22 +187,27 @@ function createLocalStorageDefaultItem() {
 }
 
 //indicate if the first string contains second string
-function isIncluded (queryString, containingString) {
+function isIncluded(queryString, containingString) {
   const lowerCaseQuery = queryString.toLowerCase();
   const lowerCaseContainingString = containingString.toLowerCase();
   return lowerCaseContainingString.includes(lowerCaseQuery);
 }
 
 //hides tasks that don't contain the query string
- function hideUnContainingTasks (queryString) {
+function hideUnContainingTasks(queryString) {
   const sectionsNodeList = document.querySelectorAll("section");
   for (let section of sectionsNodeList) {
     for (let liElm of section.children[1].children) {
       if (!isIncluded(queryString, liElm.innerText)) {
         liElm.classList.add("hidden-task");
-      }else {
+      } else {
         liElm.classList.remove("hidden-task");
       }
     }
   }
- }
+}
+
+function onDragStart(event) {
+  const draggedElement = event.target;
+
+}
