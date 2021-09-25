@@ -2,7 +2,8 @@
 setSectionsContent();
 
 //general variables:
-const idsArray = arrayOfIds();
+const API = "https://json-bins.herokuapp.com/bin/614df7b11f7bafed863edc29";
+const taskColumnIdArray = arrayOfIds();
 
 /**
  * local storage functions:
@@ -12,21 +13,21 @@ function addToLocalStorage(key, input) {
   if (!localStorage.getItem("tasks")) {
     createLocalStorageDefaultItem();
   }
-  const localStorageTaskObj = JSON.parse(localStorage.getItem("tasks"));
-  localStorageTaskObj[key].unshift(input);
-  localStorage.setItem("tasks", JSON.stringify(localStorageTaskObj));
+  const localStorageTasksObj = JSON.parse(localStorage.getItem("tasks"));
+  localStorageTasksObj[key].unshift(input);
+  localStorage.setItem("tasks", JSON.stringify(localStorageTasksObj));
 }
 
 //replaces the old text with edited text:
 function updateLocalStorage(key, indexOfCurrentValue, updatedValue = null) {
-  const localStorageTaskObj = JSON.parse(localStorage.getItem("tasks"));
-  const section = localStorageTaskObj[key];
+  const localStorageTasksObj = JSON.parse(localStorage.getItem("tasks"));
+  const section = localStorageTasksObj[key];
   if (updatedValue) {
     section.splice(indexOfCurrentValue, 1, updatedValue);
   } else {
     section.splice(indexOfCurrentValue, 1);
   }
-  localStorage.setItem("tasks", JSON.stringify(localStorageTaskObj));
+  localStorage.setItem("tasks", JSON.stringify(localStorageTasksObj));
 }
 
 /**
@@ -44,13 +45,13 @@ function addButtonHandler(event) {
       taskElm,
       relevantSection.children[1].children[0]
     ); //appends the new element to the top
-    const relevantSectionId = relevantSection.attributes[0].value;
-    addToLocalStorage(relevantSectionId, input);
+    addToLocalStorage(relevantSection.id, input);
+    event.target.parentNode.children[2].value = "";
   }
 }
 
 //makes the content editable on double click, then adds blur event
-function doubleClickHandler(event) {
+function doubleClickHandler(event) {//yuri
   const target = event.target;
   if (target.localName !== "li") {
     return;
@@ -64,27 +65,29 @@ function doubleClickHandler(event) {
 function updateTaskHandler(event) {
   const relevantTaskElement = event.target;
   relevantTaskElement.removeAttribute("contenteditable");
-  const key = event.path[2].attributes[0].value;
-  const indexOfOldText = getIndex(key, relevantTaskElement);
+  const columnName = event.path[2].id;
+  const indexOfOldText = getIndex(columnName, relevantTaskElement);
   const updatedText = relevantTaskElement.innerText;
   relevantTaskElement.innerHTML = updatedText;
-  updateLocalStorage(key, indexOfOldText, updatedText);
+  updateLocalStorage(columnName, indexOfOldText, updatedText);
   if (!updatedText) {
     relevantTaskElement.remove();
   }
 }
 
 //sets unique name for relevant item, and adds event listener for keydown
-function mouseEnterHandler(event) {
+function mouseEnterHandler(event) {//yuri
   const target = event.target;
+  target.addEventListener("mouseleave", mouseLeaveHandler);
   target.setAttribute("name", "chosen");
   document.body.addEventListener("keydown", keyDownHandler);
 }
 
 //resets every change the mouseenter did
-function mouseLeaveHandler(event) {
+function mouseLeaveHandler(event) {//yuri
   const target = event.target;
-  target.removeAttribute("name");
+  target.removeEventListener("keydown", keyDownHandler);
+  target.removeAttribute("name");//yuri
   document.body.removeEventListener("keydown", keyDownHandler);
 }
 
@@ -97,20 +100,20 @@ function keyDownHandler(event) {
 }
 
 //shifting task between lists and updates local storage
-function altKeyPressedHandler(pressed) {
-  if (pressed - 3 <= 0) {
+function altKeyPressedHandler(keyPressed) {
+  if (keyPressed - 3 <= 0) {
     const relevantTaskElement = document.getElementsByName("chosen")[0];
     const oldSectionId =
-      relevantTaskElement.closest("section").attributes[0].value;
-    const newSectionId = idsArray[pressed - 1];
-    if (newSectionId == oldSectionId) return;
+      relevantTaskElement.closest("section").id;
+    const newSectionId = taskColumnIdArray[keyPressed - 1];
+    if (newSectionId === oldSectionId) return;
     moveBetweenSections(oldSectionId, newSectionId, relevantTaskElement);
   }
 }
 
 
 //takes input and show tasks that includes it
-function searchTasksByQuery(event) {
+function searchTasksByQuery(event) {//yuri
   const query = event.target.value;
   hideUnContainingTasks(query);
 }
@@ -119,28 +122,28 @@ function searchTasksByQuery(event) {
  * extra functions
  */
 //moves task between sections and updates the local storage
-function moveBetweenSections(oldId, newId, element) {
-  const index = getIndex(oldId, element);
-  element.remove();
+function moveBetweenSections(oldId, newId, taskToMove) {
+  const taskColumnIndex = getIndex(oldId, taskToMove);
+  taskToMove.remove();
   const listWrapperElement = document.getElementById(newId).children[1]
-  const firstChild = listWrapperElement.firstChild;
-  listWrapperElement.insertBefore(element, firstChild);
-  updateLocalStorage(oldId, index);
-  addToLocalStorage(newId, element.innerText);
+  const firstChildOfNewColumn = listWrapperElement.firstChild;
+  listWrapperElement.insertBefore(taskToMove, firstChildOfNewColumn);
+  updateLocalStorage(oldId, taskColumnIndex);
+  addToLocalStorage(newId, taskToMove.innerText);
 }
 
 //creates a relevant <li> element
 function createListElement(text) {
-  const element = document.createElement("li");
-  element.classList.add("task");
-  element.setAttribute("onmouseenter", "mouseEnterHandler(event)");
-  element.setAttribute("onmouseleave", "mouseLeaveHandler(event)");
-  element.innerText = text;
-  return element;
+  const taskElement = document.createElement("li");
+  taskElement.classList.add("task");
+  taskElement.setAttribute("onmouseenter", "mouseEnterHandler(event)");
+  taskElement.setAttribute("onmouseleave", "mouseLeaveHandler(event)");
+  taskElement.innerText = text;
+  return taskElement;
 }
 
 //creates an array of the ids
-function arrayOfIds() {
+function arrayOfIds() {//yuri
   let arrOfId = [];
   const sectionsCollection = document.getElementsByTagName("section");
   for (let element of sectionsCollection) {
@@ -149,16 +152,16 @@ function arrayOfIds() {
   return arrOfId;
 }
 
-//sets every section's context by the local storage:
+//sets every section's content by the local storage:
 function setSectionsContent() {
   if (localStorage.getItem("tasks")) {
-    const localStorageTaskObj = JSON.parse(localStorage.getItem("tasks"));
+    const localStorageTasksObj = JSON.parse(localStorage.getItem("tasks"));
     const sectionsNodeList = document.querySelectorAll("section");
     for (let section of sectionsNodeList) {
-      const sectionId = section.attributes[0].value;
+      const sectionId = section.id;
       const ulElm = section.children[1];
-      for (let i = 0; i < localStorageTaskObj[sectionId].length; i++) {
-        ulElm.append(createListElement(localStorageTaskObj[sectionId][i]));
+      for (let i = 0; i < localStorageTasksObj[sectionId].length; i++) {
+        ulElm.append(createListElement(localStorageTasksObj[sectionId][i]));
       }
     }
   } else {
@@ -168,7 +171,7 @@ function setSectionsContent() {
 }
 
 //finds task's index in its list
-function getIndex(key, element) {
+function getIndex(key, element) {//yuri
   const liElementNodeList = document.getElementById(key).querySelectorAll("li");
   const liElementArr = Array.from(liElementNodeList);
   return liElementArr.indexOf(element);
@@ -207,7 +210,66 @@ function hideUnContainingTasks(queryString) {
   }
 }
 
-function onDragStart(event) {
-  const draggedElement = event.target;
+
+// sets which event should happen
+// function setsEventsAndHandlers (event) {
+//   const target = event.target;
+//   const targetTagName = target.nodeName.toLowerCase();
+//   switch (targetTagName) {
+//     case "div":
+//       target.ondblclick = "doubleClickHandler(event)";
+//       break;
+//     case "li":
+
+//   }
+
+// }
+
+// click for adding
+// dblclick for edit
+// enter to shift
+// input for search
+
+//sets the displayed tasks from the API
+async function domFromApiHandler() {
+  const jsonObjectFromApi = await fetch(API);
+  const objectFromApi = await jsonObjectFromApi.json();
+  const jsonTasksObjectFromApi = JSON.stringify(objectFromApi.tasks);
+  localStorage.setItem("tasks", jsonTasksObjectFromApi);
+  const tasksList = document.querySelectorAll("li");
+  for (let task of tasksList) {
+    task.remove()
+  }
+  setSectionsContent()
+}
+
+
+async function syncApiFromDom() {
+  const localStorageTasksObj = localStorage.getItem("tasks");
+  let tasks = { todo: [], "in-progress": [], done: [] };
+  const d = document.querySelectorAll("section");
+  for (let b of d) {
+    const q = b.children[1].children;
+    for (let p of q) {
+      tasks[b.id].push(p.innerText);
+    }
+  }
+  // console.log({localStorageTasksObj}, "A", JSON.stringify(arr), "B", arr, "C", JSON.stringify(localStorageTasksObj))
+
+  await fetch(API, {
+    method: 'PUT', // Method itself
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8' // Indicates the content 
+    },
+    body: JSON.stringify(tasks) // We send data in JSON format
+  }
+  )
 
 }
+//binId:"614df7b11f7bafed863edc29",
+// const almostAns = await fetch(URL, {
+//   method: "POST",
+//   body: JSON.stringify({
+//     text,
+//   }),
+// });

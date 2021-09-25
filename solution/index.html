@@ -10,6 +10,10 @@
   </head>
   <body>
     <h2 id="page-title">Tasks organizer</h2>
+    <span style="display: box; border: 5px solid cyan; text-align: end;">
+      <code id="load-btn" onclick="domFromApiHandler()">load</code>
+      <code id="sync" onclick="syncApiFromDom()">sync</code>
+    </span>
     <input id="search" type="search" oninput="searchTasksByQuery(event)" placeholder="search in tasks" />
     <div id="tasksArea" ondblclick="doubleClickHandler(event)">
       <section id="todo">
