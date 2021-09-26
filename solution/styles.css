@@ -6,6 +6,7 @@ section {
     padding-bottom: 0px;
     border-radius: 10px;
     font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    background-color: bisque;
   }
   .hidden-task {
     display: none;
@@ -44,6 +45,7 @@ section {
     border-radius: 15px;
     margin: 15px;
     cursor: pointer;
+    background-color: darkturquoise;
   }
   
   .buttons-container {
@@ -62,5 +64,17 @@ section {
     justify-content: space-between;
     flex-direction: row;
     align-items: flex-start;
+  }
+  html { 
+    background: url(./assets/background.jpg) no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+  }
+  .column-header {
+    border: 1px dotted sandybrown;
+    border-radius: 40px;
+    background-color: salmon;
   }
   

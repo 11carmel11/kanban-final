@@ -261,3 +261,13 @@ function loaderMaker() {
   loader.classList.add("loader");
   return loader;
 }
+
+//clears dom
+function clearDom () {
+  createLocalStorageDefaultItem();
+  const sectionsNodeList = document.querySelectorAll("section");
+    for (let section of sectionsNodeList) {
+      const ulElmList = section.children[1];
+      ulElmList.innerHTML = "";
+    }
+}
