@@ -276,7 +276,7 @@ function loaderMaker() {
   return loader;
 }
 
-//clears dom
+//clears dom and local storage
 function clearDom() {
   createLocalStorageDefaultItem();
   const sectionsNodeList = document.querySelectorAll("section");
@@ -284,4 +284,10 @@ function clearDom() {
     const ulElmList = section.children[1];
     ulElmList.innerHTML = "";
   }
+}
+
+//clears dom, local storage and API
+function clearAll() {
+  clearDom();
+  saveDomInApi();
 }

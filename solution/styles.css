@@ -77,4 +77,7 @@ section {
     border-radius: 40px;
     background-color: salmon;
   }
+  li {
+      margin-bottom: 3px;
+  }
   
