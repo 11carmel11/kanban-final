@@ -1,9 +1,10 @@
+//general variables:
+const API = "https://json-bins.herokuapp.com/bin/614ad95a4021ac0e6c080c0d";
+const taskColumnIdArray = arrayOfColumnIds();
+const loader = loaderMaker();
+
 //website setup:
 setSectionsContent();
-
-//general variables:
-const API = "https://json-bins.herokuapp.com/bin/614df7b11f7bafed863edc29";
-const taskColumnIdArray = arrayOfIds();
 
 /**
  * local storage functions:
@@ -51,7 +52,7 @@ function addButtonHandler(event) {
 }
 
 //makes the content editable on double click, then adds blur event
-function doubleClickHandler(event) {//yuri
+function doubleClickHandler(event) {
   const target = event.target;
   if (target.localName !== "li") {
     return;
@@ -66,7 +67,7 @@ function updateTaskHandler(event) {
   const relevantTaskElement = event.target;
   relevantTaskElement.removeAttribute("contenteditable");
   const columnName = event.path[2].id;
-  const indexOfOldText = getIndex(columnName, relevantTaskElement);
+  const indexOfOldText = getTaskElementIndex(columnName, relevantTaskElement);
   const updatedText = relevantTaskElement.innerText;
   relevantTaskElement.innerHTML = updatedText;
   updateLocalStorage(columnName, indexOfOldText, updatedText);
@@ -76,18 +77,18 @@ function updateTaskHandler(event) {
 }
 
 //sets unique name for relevant item, and adds event listener for keydown
-function mouseEnterHandler(event) {//yuri
+function mouseEnterHandler(event) {
   const target = event.target;
-  target.addEventListener("mouseleave", mouseLeaveHandler);
   target.setAttribute("name", "chosen");
   document.body.addEventListener("keydown", keyDownHandler);
 }
 
 //resets every change the mouseenter did
-function mouseLeaveHandler(event) {//yuri
+function mouseLeaveHandler(event) {
   const target = event.target;
-  target.removeEventListener("keydown", keyDownHandler);
-  target.removeAttribute("name");//yuri
+  if (target.attributes[3].value === "chosen") {
+    target.removeAttribute("name");
+  }
   document.body.removeEventListener("keydown", keyDownHandler);
 }
 
@@ -103,17 +104,15 @@ function keyDownHandler(event) {
 function altKeyPressedHandler(keyPressed) {
   if (keyPressed - 3 <= 0) {
     const relevantTaskElement = document.getElementsByName("chosen")[0];
-    const oldSectionId =
-      relevantTaskElement.closest("section").id;
+    const oldSectionId = relevantTaskElement.closest("section").id;
     const newSectionId = taskColumnIdArray[keyPressed - 1];
     if (newSectionId === oldSectionId) return;
     moveBetweenSections(oldSectionId, newSectionId, relevantTaskElement);
   }
 }
 
-
 //takes input and show tasks that includes it
-function searchTasksByQuery(event) {//yuri
+function searchTasksByQuery(event) {
   const query = event.target.value;
   hideUnContainingTasks(query);
 }
@@ -123,9 +122,9 @@ function searchTasksByQuery(event) {//yuri
  */
 //moves task between sections and updates the local storage
 function moveBetweenSections(oldId, newId, taskToMove) {
-  const taskColumnIndex = getIndex(oldId, taskToMove);
+  const taskColumnIndex = getTaskElementIndex(oldId, taskToMove);
   taskToMove.remove();
-  const listWrapperElement = document.getElementById(newId).children[1]
+  const listWrapperElement = document.getElementById(newId).children[1];
   const firstChildOfNewColumn = listWrapperElement.firstChild;
   listWrapperElement.insertBefore(taskToMove, firstChildOfNewColumn);
   updateLocalStorage(oldId, taskColumnIndex);
@@ -143,7 +142,7 @@ function createListElement(text) {
 }
 
 //creates an array of the ids
-function arrayOfIds() {//yuri
+function arrayOfColumnIds() {
   let arrOfId = [];
   const sectionsCollection = document.getElementsByTagName("section");
   for (let element of sectionsCollection) {
@@ -171,7 +170,7 @@ function setSectionsContent() {
 }
 
 //finds task's index in its list
-function getIndex(key, element) {//yuri
+function getTaskElementIndex(key, element) {
   const liElementNodeList = document.getElementById(key).querySelectorAll("li");
   const liElementArr = Array.from(liElementNodeList);
   return liElementArr.indexOf(element);
@@ -210,66 +209,55 @@ function hideUnContainingTasks(queryString) {
   }
 }
 
-
-// sets which event should happen
-// function setsEventsAndHandlers (event) {
-//   const target = event.target;
-//   const targetTagName = target.nodeName.toLowerCase();
-//   switch (targetTagName) {
-//     case "div":
-//       target.ondblclick = "doubleClickHandler(event)";
-//       break;
-//     case "li":
-
-//   }
-
-// }
-
-// click for adding
-// dblclick for edit
-// enter to shift
-// input for search
+//returns json from API
+async function getResponseAsJson(URL) {
+  const response = await fetch(URL);
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
 
 //sets the displayed tasks from the API
-async function domFromApiHandler() {
-  const jsonObjectFromApi = await fetch(API);
-  const objectFromApi = await jsonObjectFromApi.json();
-  const jsonTasksObjectFromApi = JSON.stringify(objectFromApi.tasks);
-  localStorage.setItem("tasks", jsonTasksObjectFromApi);
-  const tasksList = document.querySelectorAll("li");
-  for (let task of tasksList) {
-    task.remove()
-  }
-  setSectionsContent()
-}
-
-
-async function syncApiFromDom() {
-  const localStorageTasksObj = localStorage.getItem("tasks");
-  let tasks = { todo: [], "in-progress": [], done: [] };
-  const d = document.querySelectorAll("section");
-  for (let b of d) {
-    const q = b.children[1].children;
-    for (let p of q) {
-      tasks[b.id].push(p.innerText);
+async function loadDomFromApiHandler() {
+  document.body.append(loader);
+  try {
+    const response = await getResponseAsJson(API);
+    loader.remove();
+    const tasksObjectFromApi = JSON.parse(response.tasks)
+    localStorage.setItem("tasks", JSON.stringify(tasksObjectFromApi));
+    const tasksList = document.querySelectorAll("li");
+    console.log()
+    for (let task of tasksList) {
+      task.remove();
     }
-  }
-  // console.log({localStorageTasksObj}, "A", JSON.stringify(arr), "B", arr, "C", JSON.stringify(localStorageTasksObj))
-
-  await fetch(API, {
-    method: 'PUT', // Method itself
-    headers: {
-      'Content-type': 'application/json; charset=UTF-8' // Indicates the content 
-    },
-    body: JSON.stringify(tasks) // We send data in JSON format
-  }
-  )
-
+    setSectionsContent();
+  } catch {
+    loader.remove();
+    console.log("An error ocurred, so sorry!")
+  }  
 }
-//binId:"614df7b11f7bafed863edc29",
-// const almostAns = await fetch(URL, {
-//   method: "POST",
-//   body: JSON.stringify({
-//     text,
-//   }),
-// });
+
+//saves the the current tasks at the API
+async function saveDomInApi() {
+  document.body.append(loader);
+  try {
+    const { tasks } = localStorage;
+    await fetch(API, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ tasks }),
+    });
+    loader.remove();
+  } catch {
+    loader.remove();
+    console.log("An error ocurred, so sorry!")
+  }
+}
+
+//creates loader element
+function loaderMaker() {
+  const loader = document.createElement("div");
+  loader.classList.add("loader");
+  return loader;
+}

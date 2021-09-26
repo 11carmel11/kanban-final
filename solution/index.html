@@ -9,31 +9,46 @@
     <title>Tasks manager</title>
   </head>
   <body>
-    <h2 id="page-title">Tasks organizer</h2>
-    <span style="display: box; border: 5px solid cyan; text-align: end;">
-      <code id="load-btn" onclick="domFromApiHandler()">load</code>
-      <code id="sync" onclick="syncApiFromDom()">sync</code>
-    </span>
-    <input id="search" type="search" oninput="searchTasksByQuery(event)" placeholder="search in tasks" />
-    <div id="tasksArea" ondblclick="doubleClickHandler(event)">
-      <section id="todo">
-        <b>tasks to do</b>
-        <ul class="to-do-tasks"></ul>
-        <input type="text" id="add-to-do-task" placeholder="add task"/>
-        <button id="submit-add-to-do" onclick="addButtonHandler(event)">ADD</button>
-      </section>
-      <section id="in-progress">
-        <b>tasks in progress</b>
-        <ul class="in-progress-tasks"></ul>
-        <input type="text" id="add-in-progress-task" placeholder="add task"/>
-        <button id="submit-add-in-progress" onclick="addButtonHandler(event)">ADD</button>
-      </section>
-      <section id="done">
-        <b>done tasks</b>
-        <ul class="done-tasks"></ul>
-        <input type="text" id="add-done-task" placeholder="add task"/>
-        <button id="submit-add-done" onclick="addButtonHandler(event)">ADD</button>
-      </section>
-    </div>
+      <h2 id="page-title">Tasks organizer</h2>
+      <span class="buttons-container">
+        <code id="load-btn" onclick="loadDomFromApiHandler()"><b>load</b></code>
+        <code id="save-btn" onclick="saveDomInApi()"><b>save</b></code>
+      </span>
+      <input
+        id="search"
+        type="search"
+        oninput="searchTasksByQuery(event)"
+        placeholder="search in tasks"
+      />
+      <div
+        id="tasksArea"
+        class="tasks-area"
+        ondblclick="doubleClickHandler(event)"
+      >
+        <section id="todo" ondrop="dropTaskHandler(event)">
+          <b class="column-header">tasks to do</b>
+          <ul class="to-do-tasks"></ul>
+          <input type="text" id="add-to-do-task" placeholder="add task" />
+          <button id="submit-add-to-do" onclick="addButtonHandler(event)">
+            ADD
+          </button>
+        </section>
+        <section id="in-progress">
+          <b class="column-header">tasks in progress</b>
+          <ul class="in-progress-tasks"></ul>
+          <input type="text" id="add-in-progress-task" placeholder="add task" />
+          <button id="submit-add-in-progress" onclick="addButtonHandler(event)">
+            ADD
+          </button>
+        </section>
+        <section id="done">
+          <b class="column-header">done tasks</b>
+          <ul class="done-tasks"></ul>
+          <input type="text" id="add-done-task" placeholder="add task" />
+          <button id="submit-add-done" onclick="addButtonHandler(event)">
+            ADD
+          </button>
+        </section>
+      </div>
   </body>
 </html>

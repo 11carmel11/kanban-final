@@ -1,6 +1,66 @@
 section {
-    display: inline-block;
-}
-.hidden-task {
-    display:none;
-}
+    display: flex;
+    flex-direction: column;
+    border: 5px solid #ecdede;
+    margin: 50px;
+    padding-bottom: 0px;
+    border-radius: 10px;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  }
+  .hidden-task {
+    display: none;
+  }
+  .loader {
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid rgb(101, 208, 223);
+    border-bottom: 16px solid rgb(101, 208, 223);
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+    align-self: center;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+  h2 {
+    align-self: center;
+    padding-bottom: 15px;
+  }
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  code {
+    display: box;
+    border: 5px solid cyan;
+    padding: 15px 30px;
+    border-radius: 15px;
+    margin: 15px;
+    cursor: pointer;
+  }
+  
+  .buttons-container {
+    align-self: center;
+  }
+  
+  #search {
+    margin-top: 30px;
+    width: 300px;
+    align-self: center;
+  }
+  
+  .tasks-area {
+    display: flex;
+    align-self: center;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  
