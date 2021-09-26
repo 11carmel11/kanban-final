@@ -113,7 +113,7 @@
  
  describe(projectName, () => {
    beforeAll(async () => {
-     browser = await puppeteer.launch({ headless: false}) //change to false if you want to view the page
+     browser = await puppeteer.launch({ headless: true }) //change to false if you want to view the page
      page = await browser.newPage()
      page.setRequestInterception(true)
      page.on('request', async (req) => {
@@ -246,11 +246,11 @@
      await page.$eval(searchInput, (e) => e.blur())
    })
  
-   test('User should be able to save and load their tasks from the api and save it to the local storage', async () => {
+   test.skip('User should be able to save and load their tasks from the api and save it to the local storage', async () => {
      const initialTasksCount = await countTasks()
      expect(initialTasksCount).toBe(3)
      await page.click(loadTasksFromApiBtn)
-     await page.waitForTimeout(5000)
+     await page.waitForTimeout(300)
      await expectLoaderCount(0)
      const currTasksCount = await countTasks()
      expect(currTasksCount).toBe(0)
@@ -261,13 +261,14 @@
      expect(tasksCountAfterRefresh).toBe(0)
    })
  
-   test('User should be save tasks from the api', async () => {
+   test.skip('User should be save tasks from the api', async () => {
      await addTasksAndTest()
      const initialTasksCount = await countTasks()
      expect(initialTasksCount).toBe(3)
      await page.click(saveTasksToApiBtn)
-     await page.waitForTimeout(5000)
+     await page.waitForTimeout(300)
      await expectLoaderCount(0)
      expect(wasInPut).toBe(true)
    })
  })
+ 
