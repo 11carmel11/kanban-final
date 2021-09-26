@@ -222,18 +222,18 @@ async function loadDomFromApiHandler() {
   try {
     const response = await getResponseAsJson(API);
     loader.remove();
-    const tasksObjectFromApi = JSON.parse(response.tasks)
+    const tasksObjectFromApi = JSON.parse(response.tasks);
     localStorage.setItem("tasks", JSON.stringify(tasksObjectFromApi));
     const tasksList = document.querySelectorAll("li");
-    console.log()
+    console.log();
     for (let task of tasksList) {
       task.remove();
     }
     setSectionsContent();
   } catch {
     loader.remove();
-    console.log("An error ocurred, so sorry!")
-  }  
+    console.log("An error ocurred, so sorry!");
+  }
 }
 
 //saves the the current tasks at the API
@@ -251,7 +251,7 @@ async function saveDomInApi() {
     loader.remove();
   } catch {
     loader.remove();
-    console.log("An error ocurred, so sorry!")
+    console.log("An error ocurred, so sorry!");
   }
 }
 
@@ -263,11 +263,11 @@ function loaderMaker() {
 }
 
 //clears dom
-function clearDom () {
+function clearDom() {
   createLocalStorageDefaultItem();
   const sectionsNodeList = document.querySelectorAll("section");
-    for (let section of sectionsNodeList) {
-      const ulElmList = section.children[1];
-      ulElmList.innerHTML = "";
-    }
+  for (let section of sectionsNodeList) {
+    const ulElmList = section.children[1];
+    ulElmList.innerHTML = "";
+  }
 }
