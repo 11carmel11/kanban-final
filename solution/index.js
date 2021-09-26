@@ -225,15 +225,29 @@ async function loadDomFromApiHandler() {
     const tasksObjectFromApi = JSON.parse(response.tasks);
     localStorage.setItem("tasks", JSON.stringify(tasksObjectFromApi));
     const tasksList = document.querySelectorAll("li");
-    console.log();
     for (let task of tasksList) {
       task.remove();
     }
     setSectionsContent();
   } catch {
     loader.remove();
-    console.log("An error ocurred, so sorry!");
+    errorShower();
   }
+}
+
+//shows an error in search field
+function errorShower() {
+  const searchInput = document.getElementById("search");
+  searchInput.value = "An error ocurred, so sorry!";
+  searchInput.style.backgroundColor = "red";
+  setTimeout(errorDelete, 1500);
+}
+
+//deletes the error
+function errorDelete() {
+  const searchInput = document.getElementById("search");
+  searchInput.value = "";
+  searchInput.removeAttribute("style");
 }
 
 //saves the the current tasks at the API
@@ -251,7 +265,7 @@ async function saveDomInApi() {
     loader.remove();
   } catch {
     loader.remove();
-    console.log("An error ocurred, so sorry!");
+    errorShower();
   }
 }
 
