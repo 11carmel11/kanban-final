@@ -36,7 +36,7 @@ function updateLocalStorage(key, indexOfCurrentValue, updatedValue = null) {
  */
 //adds the task to list on click
 function addButtonHandler(event) {
-  const relevantSection = event.path[1];
+  const relevantSection = event.target.closest("section");
   const input = relevantSection.children[2].value;
   if (!input) {
     alert("sorry... please enter your task");
@@ -86,7 +86,7 @@ function mouseEnterHandler(event) {
 //resets every change the mouseenter did
 function mouseLeaveHandler(event) {
   const target = event.target;
-  if (target.attributes[3].value === "chosen") {
+  if (target.name === "chosen") {
     target.removeAttribute("name");
   }
   document.body.removeEventListener("keydown", keyDownHandler);
@@ -102,7 +102,7 @@ function keyDownHandler(event) {
 
 //shifting task between lists and updates local storage
 function altKeyPressedHandler(keyPressed) {
-  if (keyPressed - 3 <= 0) {
+  if (keyPressed <= 3) {
     const relevantTaskElement = document.getElementsByName("chosen")[0];
     const oldSectionId = relevantTaskElement.closest("section").id;
     const newSectionId = taskColumnIdArray[keyPressed - 1];
@@ -115,6 +115,60 @@ function altKeyPressedHandler(keyPressed) {
 function searchTasksByQuery(event) {
   const query = event.target.value;
   hideUnContainingTasks(query);
+}
+
+//clears dom and local storage
+function clearDom() {
+  createLocalStorageDefaultItem();
+  const sectionsNodeList = document.querySelectorAll("section");
+  for (let section of sectionsNodeList) {
+    const ulElmList = section.children[1];
+    ulElmList.innerHTML = "";
+  }
+}
+
+//clears dom, local storage and API
+function clearAll() {
+  clearDom();
+  saveDomInApi();
+}
+
+//saves the the current tasks at the API
+async function saveDomInApi() {
+  document.body.append(loader);
+  try {
+    const { tasks } = localStorage;
+    await fetch(API, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ tasks }),
+    });
+    loader.remove();
+  } catch {
+    loader.remove();
+    errorShower();
+  }
+}
+
+//sets the displayed tasks from the API
+async function loadDomFromApiHandler() {
+  document.body.append(loader);
+  try {
+    const response = await getResponseAsJson(API);
+    loader.remove();
+    const tasksObjectFromApi = JSON.parse(response.tasks);
+    localStorage.setItem("tasks", JSON.stringify(tasksObjectFromApi));
+    const tasksList = document.querySelectorAll("li");
+    for (let task of tasksList) {
+      task.remove();
+    }
+    setSectionsContent();
+  } catch {
+    loader.remove();
+    errorShower();
+  }
 }
 
 /**
@@ -216,25 +270,6 @@ async function getResponseAsJson(URL) {
   return jsonResponse;
 }
 
-//sets the displayed tasks from the API
-async function loadDomFromApiHandler() {
-  document.body.append(loader);
-  try {
-    const response = await getResponseAsJson(API);
-    loader.remove();
-    const tasksObjectFromApi = JSON.parse(response.tasks);
-    localStorage.setItem("tasks", JSON.stringify(tasksObjectFromApi));
-    const tasksList = document.querySelectorAll("li");
-    for (let task of tasksList) {
-      task.remove();
-    }
-    setSectionsContent();
-  } catch {
-    loader.remove();
-    errorShower();
-  }
-}
-
 //shows an error in search field
 function errorShower() {
   const searchInput = document.getElementById("search");
@@ -250,44 +285,9 @@ function errorDelete() {
   searchInput.removeAttribute("style");
 }
 
-//saves the the current tasks at the API
-async function saveDomInApi() {
-  document.body.append(loader);
-  try {
-    const { tasks } = localStorage;
-    await fetch(API, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ tasks }),
-    });
-    loader.remove();
-  } catch {
-    loader.remove();
-    errorShower();
-  }
-}
-
 //creates loader element
 function loaderMaker() {
   const loader = document.createElement("div");
   loader.classList.add("loader");
   return loader;
-}
-
-//clears dom and local storage
-function clearDom() {
-  createLocalStorageDefaultItem();
-  const sectionsNodeList = document.querySelectorAll("section");
-  for (let section of sectionsNodeList) {
-    const ulElmList = section.children[1];
-    ulElmList.innerHTML = "";
-  }
-}
-
-//clears dom, local storage and API
-function clearAll() {
-  clearDom();
-  saveDomInApi();
 }
